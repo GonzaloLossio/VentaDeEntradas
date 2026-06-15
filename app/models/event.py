@@ -8,3 +8,4 @@ class Event(SQLModel,table = True):
     date : date
     time: time
     location : str
+    is_active : bool = True
