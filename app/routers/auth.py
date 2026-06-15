@@ -15,12 +15,12 @@ async def register(user : UserCreate , db : AsyncSession  = Depends(get_db)):
     result = await db.execute(select(User).where(User.username == user.username))
     username = result.scalars().first()
     if username:
-        raise HTTPException(status_code=401, detail="User already exist")
+        raise HTTPException(status_code=400, detail="User already exist")
     
     result = await db.execute(select(User).where(User.email == user.email))
     email = result.scalars().first()
     if email:
-        raise HTTPException(status_code=401, detail="Email already has been utilized")
+        raise HTTPException(status_code=400, detail="Email already has been utilized")
 
     hashed_password = hash_password(user.password)
 
@@ -50,3 +50,6 @@ async def login(form_data : OAuth2PasswordRequestForm = Depends(), db : AsyncSes
 
     return {"access_token" : access_token, "token_type" : "bearer"}
 
+@router.get("/me",response_model = UserResponse)
+async def get_me(user : User = Depends(get_current_user)):
+    return user
