@@ -7,3 +7,4 @@ class Zone(SQLModel,table = True):
     price: float = 100.0
     capacity : int = 10000
     tickets_sold : int = 0
+    is_active : bool = True

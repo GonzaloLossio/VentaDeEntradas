@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel 
 
 class ZoneCreate(SQLModel):
-    event_id : int
     name : str
     price: float 
     capacity : int 
