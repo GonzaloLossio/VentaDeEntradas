@@ -9,7 +9,7 @@ from app.database import get_db
 from app.core.config import settings
 from app.models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt()).decode('utf-8')

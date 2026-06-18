@@ -10,7 +10,7 @@ class OrderResponse(SQLModel):
     user_id : int 
     zone_id: int 
     tickets: int 
-    stripe_payment_id : str 
+    stripe_payment_id : str | None = None
     total_price : float 
     order_state : str  
     created_at: datetime 
