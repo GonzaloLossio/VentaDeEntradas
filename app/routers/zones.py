@@ -48,19 +48,19 @@ async def get_all_zones_from_an_specific_event(event_id : int, db : AsyncSession
 
 @router.put('/events/{event_id}/zones/{zone_id}',response_model=ZoneResponse)
 async def update_zone(zone_id : int, zone_update : ZoneCreate,event_id: int, db : AsyncSession = Depends(get_db),admin_user = Depends(get_admin_user)):
-    result = await db.execute(select(Zone).where(Zone.id == zone_id))
+    result = await db.execute(select(Zone).where(Zone.id == zone_id,Zone.event_id == event_id))
     zone = result.scalars().first()
     if not zone:
         raise HTTPException(status_code=404, detail= "Zone not found")
-    for key,value in zone_update.dict().items():
+    for key,value in zone_update.model_dump().items():
         setattr(zone,key,value)
     await db.commit()
     await db.refresh(zone)    
     return zone
 
 @router.delete('/events/{event_id}/zones/{zone_id}')
-async def deactivate_zone(zone_id : int , db : AsyncSession = Depends(get_db), admin_user = Depends(get_admin_user)):
-    result = await db.execute(select(Zone).where(Zone.id == zone_id))
+async def deactivate_zone(zone_id : int , event_id: int, db : AsyncSession = Depends(get_db), admin_user = Depends(get_admin_user)):
+    result = await db.execute(select(Zone).where(Zone.id == zone_id,Zone.event_id == event_id))
     zone = result.scalars().first()
     if not zone:
         raise HTTPException(status_code=404, detail= "Zone not found")

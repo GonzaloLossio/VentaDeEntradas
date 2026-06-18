@@ -48,7 +48,7 @@ async def update_event(event_id : int , event_update : EventCreate, db : AsyncSe
     if not event:
         raise HTTPException(status_code=404, detail="There is no events with this id")
     
-    for key, value in event_update.dict().items():
+    for key, value in event_update.model_dump().items():
         setattr(event,key,value)
 
     await db.commit()

@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError,jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 from app.database import get_db
 from app.core.config import settings
 from app.models.user import User
@@ -20,9 +20,9 @@ def verify_password(password : str, hashed_password : str) -> bool:
 def create_access_token(data : dict, expire_delta : timedelta | None = None) -> str:
     to_encode = data.copy()
     if expire_delta : 
-        expire = datetime.utcnow() + expire_delta
+        expire = datetime.now(timezone.utc) + expire_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes = settings.access_token_expire_minutes) 
+        expire = datetime.now(timezone.utc) + timedelta(minutes = settings.access_token_expire_minutes) 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode,settings.secret_key,algorithm=settings.algorithm)
     return encoded_jwt
