@@ -2,22 +2,23 @@ from fastapi import APIRouter
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends,HTTPException
-from app.schemas.order import OrderCreate,OrderResponse
+from app.schemas.order import OrderCreate,OrderResponse,OrderCheckoutResponse
 from app.models.zone import Zone
 from app.models.order import Order
 from app.core.security import get_current_user
 from app.database import get_db
+from app.services.stripe_service import create_payment_intent
 
 router = APIRouter()
 
-@router.post('/orders',response_model=OrderResponse)
+@router.post('/orders',response_model=OrderCheckoutResponse)
 async def create_order(order : OrderCreate, db : AsyncSession = Depends(get_db),current_user = Depends(get_current_user)):
     result = await db.execute(select(Zone).where(Zone.id == order.zone_id, Zone.is_active == True).with_for_update())
     zone = result.scalars().first()
     if not zone:
         raise HTTPException(status_code=404, detail="Zone not found")
 
-    if zone.capacity-order.tickets-zone.tickets_sold < 0 :  
+    if zone.tickets_sold + order.tickets > zone.capacity :  
      raise HTTPException(status_code=400, detail="Not enough tickets available")
     
     total_price  = zone.price * order.tickets
@@ -33,9 +34,14 @@ async def create_order(order : OrderCreate, db : AsyncSession = Depends(get_db),
     zone.tickets_sold = zone.tickets_sold + order.tickets
 
     db.add(new_order)
+    payment = await create_payment_intent(total_price)
+    new_order.stripe_payment_id = payment["payment_intent_id"]
     await db.commit()
     await db.refresh(new_order)
-    return new_order
+    return {
+       "order" : new_order,
+       "client_secret" : payment["client_secret"]
+    }
 
 @router.get('/orders/me', response_model=list[OrderResponse])
 async def get_all_orders_for_an_user(db : AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
@@ -44,3 +50,5 @@ async def get_all_orders_for_an_user(db : AsyncSession = Depends(get_db), curren
     if not all_orders:
         raise HTTPException(status_code=404, detail= "There are no orders for this user")
     return all_orders
+
+

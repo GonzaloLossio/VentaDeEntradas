@@ -14,3 +14,7 @@ class OrderResponse(SQLModel):
     total_price : float 
     order_state : str  
     created_at: datetime 
+
+class OrderCheckoutResponse(SQLModel):
+    order: OrderResponse
+    client_secret: str
