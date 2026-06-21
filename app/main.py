@@ -11,7 +11,7 @@ from app.routers.events import router as events_router
 from app.routers.zones import router as zones_router
 from app.routers.orders import router as orders_router
 from app.routers.webhook import router as webhook_router
-
+from app.routers.tickets import router as tickets_router
 
 app = FastAPI()
 
@@ -20,6 +20,7 @@ app.include_router(events_router, prefix="/api", tags=["events"])
 app.include_router(zones_router, prefix="/api", tags=["zones"])
 app.include_router(orders_router, prefix="/api", tags=["orders"])
 app.include_router(webhook_router, prefix="/api", tags=["webhook"])
+app.include_router(webhook_router, prefix="/api", tags=["tickets"])
 
 @app.on_event("startup")
 async def on_startup():
