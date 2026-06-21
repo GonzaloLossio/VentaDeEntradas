@@ -20,7 +20,7 @@ app.include_router(events_router, prefix="/api", tags=["events"])
 app.include_router(zones_router, prefix="/api", tags=["zones"])
 app.include_router(orders_router, prefix="/api", tags=["orders"])
 app.include_router(webhook_router, prefix="/api", tags=["webhook"])
-app.include_router(webhook_router, prefix="/api", tags=["tickets"])
+app.include_router(tickets_router, prefix="/api", tags=["tickets"])
 
 @app.on_event("startup")
 async def on_startup():

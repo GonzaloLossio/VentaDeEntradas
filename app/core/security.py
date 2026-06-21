@@ -50,5 +50,5 @@ async def get_current_user(token:str = Depends(oauth2_scheme), db: AsyncSession 
     
 async def get_admin_user(user: User = Depends(get_current_user)):
     if user.role != "admin":
-        raise HTTPException(status_code=401, detail = "Access denied to client ")    
+        raise HTTPException(status_code=403, detail = "Access denied. Administrator privileges required.")    
     return user

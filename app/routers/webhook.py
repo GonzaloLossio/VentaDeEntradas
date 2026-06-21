@@ -32,6 +32,9 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     if not order:
         return {"status": "ok"}
 
+    if order.order_state in ["Completed", "Failed"]:
+        return {"status": "ok"}
+
     if event["type"] == "payment_intent.succeeded":
         order.order_state = "Completed"
         for _ in range(order.tickets):

@@ -34,14 +34,29 @@ async def create_order(order : OrderCreate, db : AsyncSession = Depends(get_db),
     zone.tickets_sold = zone.tickets_sold + order.tickets
 
     db.add(new_order)
-    payment = await create_payment_intent(total_price)
-    new_order.stripe_payment_id = payment["payment_intent_id"]
     await db.commit()
     await db.refresh(new_order)
-    return {
-       "order" : new_order,
-       "client_secret" : payment["client_secret"]
-    }
+
+    try:
+        payment = await create_payment_intent(total_price)
+        new_order.stripe_payment_id = payment["payment_intent_id"]
+        await db.commit()
+        await db.refresh(new_order)
+        
+        return {
+           "order": new_order,
+           "client_secret": payment["client_secret"]
+        }
+    except Exception as e: 
+        result = await db.execute(select(Zone).where(Zone.id == order.zone_id).with_for_update())
+        rollback_zone = result.scalars().first()
+        if rollback_zone:
+            rollback_zone.tickets_sold -= order.tickets
+            
+        new_order.order_state = "Failed"
+        await db.commit()
+        
+        raise HTTPException(status_code=500, detail="Payment gateway communication error. Order canceled.")
 
 @router.get('/orders/me', response_model=list[OrderResponse])
 async def get_all_orders_for_an_user(db : AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
