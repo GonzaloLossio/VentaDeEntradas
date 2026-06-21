@@ -44,7 +44,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
 
     elif event["type"] == "payment_intent.payment_failed":
         order.order_state = "Failed"
-        result = await db.execute(select(Zone).where(Zone.id == order.zone_id))
+        result = await db.execute(select(Zone).where(Zone.id == order.zone_id).with_for_update())
         zone = result.scalars().first()
         if zone:
             zone.tickets_sold -= order.tickets
