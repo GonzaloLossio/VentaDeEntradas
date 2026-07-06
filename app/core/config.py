@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes : int = 30
     stripe_secret_key : str
     stripe_webhook_secret: str
+    test_database_url: str 
     
     class Config:
         env_file = ".env"

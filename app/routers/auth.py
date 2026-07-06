@@ -10,7 +10,7 @@ from app.database import get_db
 
 router = APIRouter()
 
-@router.post("/register", response_model = UserResponse)
+@router.post("/register", response_model = UserResponse, status_code=201)
 async def register(user : UserCreate , db : AsyncSession  = Depends(get_db)):
     result = await db.execute(select(User).where(User.username == user.username))
     username = result.scalars().first()
