@@ -10,7 +10,7 @@ from app.database import get_db
 
 router = APIRouter()
 
-@router.post('/events', response_model=EventResponse)
+@router.post('/events', response_model=EventResponse,status_code=201)
 async def create_events(event : EventCreate, db : AsyncSession = Depends(get_db), admin_user = Depends(get_admin_user)):
     new_event = Event(
         title = event.title,
