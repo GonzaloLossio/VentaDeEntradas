@@ -10,7 +10,7 @@ from app.database import get_db
 
 router = APIRouter()
 
-@router.post('/events/{event_id}/zones',response_model=ZoneResponse)
+@router.post('/events/{event_id}/zones',response_model=ZoneResponse,status_code=201)
 async def create_zone(zone : ZoneCreate, event_id: int, db : AsyncSession = Depends(get_db), admin_user = Depends(get_admin_user)):
     result = await db.execute(select(Event).where(Event.id == event_id))
     valid_event = result.scalars().first()
