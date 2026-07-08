@@ -68,7 +68,7 @@ async def auth_headers_admin(client,db):
     db.add(admin_user)
     await db.commit()
 
-    response = await client.post("api/auth/login", data = {
+    response = await client.post("/api/auth/login", data = {
         "username": "admintest",
         "password": "testpassword"
     })
@@ -90,7 +90,7 @@ async def auth_headers_client(client,db):
     db.add(client_user)
     await db.commit()
 
-    response = await client.post("api/auth/login", data = {
+    response = await client.post("/api/auth/login", data = {
         "username": "clienttest",
         "password": "testpassword"
     })
