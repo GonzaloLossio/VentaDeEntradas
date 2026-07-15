@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch, AsyncMock
 
 @pytest.mark.asyncio
 async def test_create_order_success(client, auth_headers_admin, auth_headers_client):
@@ -20,10 +21,16 @@ async def test_create_order_success(client, auth_headers_admin, auth_headers_cli
 
     zone_id = create_zone_response.json()["id"]
 
-    create_order_response = await client.post("/api/orders",json= {
-        "tickets" :"2" ,
-        "zone_id" : f"{zone_id}"
-    },headers = auth_headers_client)
+    with patch("app.routers.orders.create_payment_intent", new_callable=AsyncMock) as mock_payment:
+        mock_payment.return_value = {
+            "payment_intent_id": "pi_test_123",
+            "client_secret": "secret_test_123"
+        }
+
+        create_order_response = await client.post("/api/orders",json= {
+            "tickets": 2,
+            "zone_id": zone_id
+        },headers = auth_headers_client)
 
     assert create_order_response.status_code == 200
     data = create_order_response.json()
