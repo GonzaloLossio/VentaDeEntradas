@@ -38,6 +38,7 @@ jobs:
 
       - name: Run tests
         env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ventaentradas_test
           TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ventaentradas_test
           SECRET_KEY: testsecretkey
           ALGORITHM: HS256
