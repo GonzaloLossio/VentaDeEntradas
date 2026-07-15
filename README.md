@@ -53,6 +53,7 @@ La forma más sencilla de levantar el proyecto es usando Docker Compose:
 
 A pesar de que el núcleo transaccional es robusto y funcional, existen oportunidades de mejora para acercar la arquitectura a un estándar corporativo:
 
+
 * **Tipado estricto en estados transaccionales:** Actualmente, los estados de las órdenes de compra (como "Pending" o "Completed") se manejan como cadenas de texto plano. El sistema debe refactorizarse para utilizar Enumeraciones (`Enum` de Python) para evitar errores de tipeo y mejorar la consistencia a nivel de base de datos.
 * **Liberación de carritos abandonados:** Si un usuario inicia el proceso de compra, el sistema retiene los boletos. Sin embargo, si el cliente abandona la página sin pagar, esos boletos quedan bloqueados indefinidamente. Es necesario implementar un trabajador en segundo plano (utilizando Celery o BackgroundTasks) que cancele automáticamente las órdenes pendientes tras 10 minutos y libere el inventario.
 * **Cobertura de tests al 100%:** Actualmente el proyecto cuenta con 33 tests cubriendo los flujos principales. Como área de mejora, se pueden agregar tests específicos para la lógica de concurrencia y las respuestas del webhook de Stripe bajo condiciones de carga simulada.
